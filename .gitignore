@@ -1,0 +1,5 @@
+venv/
+.env
+.env.backup
+routine_data.db
+__pycache__/

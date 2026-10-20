@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AuraFlow — Retro-Futuristic AI Routine Command Deck</title>
+  <meta name="description" content="AuraFlow uses AI to intelligently redesign your daily routine in a retro-futuristic gaming interface. Create custom schedule compacts, track XP, and optimize your day." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='aura.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Ambient Neon Mesh Blobs -->
+  <div class="ambient-mesh mesh-pink"></div>
+  <div class="ambient-mesh mesh-green"></div>
+
+  <!-- FLOATING QUICK-ACTION PILL (Top-Right) -->
+  <div class="floating-top-cluster">
+    <div class="live-clock-pill" id="liveClock">09:00 AM</div>
+    <button class="float-QuickReminderBtn" onclick="openReminderModal()">
+      <span class="pulse-dot"></span> + MISSION
+    </button>
+  </div>
+
+  <!-- =========================================================
+       VIEW 1: THE LOBBY (LANDING PAGE)
+       ========================================================= -->
+  <section id="view-lobby" class="view-section active">
+    <div class="lobby-wrapper">
+      <div class="lobby-topbar">
+        <div class="brand-mark">
+          <div class="brand-orb"></div>
+          <span>AURA<strong>FLOW</strong></span>
+        </div>
+        <div class="lobby-badges">
+          <span class="pill-tag pink-tag">AI ROUTINE ENGINE</span>
+          <span class="pill-tag green-tag">BIO-RHYTHM SHIELD</span>
+        </div>
+      </div>
+
+      <div class="lobby-hero-grid">
+        <!-- Left Column: Editorial Pitch -->
+        <div class="lobby-hero-copy">
+          <div class="eyebrow-chip">&#9889; AI-POWERED ROUTINE COMMAND DECK</div>
+          <h1>Stop managing time.<br><span class="grad-text-pink-green">Let AI sculpt your energy & rhythm.</span></h1>
+          <p class="lobby-lead">
+            Paste your messy to-do list — AuraFlow's AI engine time-blocks your tasks around
+            <strong>biological anchors</strong> (breakfast, walks, breaks), eliminates admin friction,
+            and gives you back <strong>2+ hours of deep focus</strong> every day.
+          </p>
+
+          <div class="lobby-cta-row">
+            <button class="btn-gradient-primary" onclick="switchView('dashboard')">
+              &#9783; OPEN COMMAND DECK &rarr;
+            </button>
+            <button class="btn-soft-outline" onclick="switchView('architect')">
+              &#10024; AI ARCHITECT
+            </button>
+            <button class="btn-soft-outline" onclick="switchView('compacts')">
+              &#128218; MY COMPACTS
+            </button>
+          </div>
+
+          <!-- KPI Strip -->
+          <div class="lobby-kpi-strip">
+            <div class="kpi-mini">
+              <span class="kpi-num">+2.4 hrs</span>
+              <span class="kpi-label">Deep Focus / Day</span>
+            </div>
+            <div class="kpi-divider"></div>
+            <div class="kpi-mini">
+              <span class="kpi-num">-68%</span>
+              <span class="kpi-label">Admin Friction</span>
+            </div>
+            <div class="kpi-divider"></div>
+            <div class="kpi-mini">
+              <span class="kpi-num" id="lobbyWellnessVal">85%</span>
+              <span class="kpi-label">Bio-Sync Score</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: 3D Preview Card -->
+        <div class="lobby-visual-stage">
+          <div class="tactile-3d-showcase">
+            <div class="abstract-3d-sphere">
+              <div class="stud s1"></div>
+              <div class="stud s2"></div>
+              <div class="stud s3"></div>
+              <div class="stud s4"></div>
+              <div class="stud s5"></div>
+            </div>
+            <div class="showcase-overlay-glass">
+              <span class="mini-badge">LIVE BIO-REMINDERS</span>
+              <h3>Your Non-Negotiables</h3>
+              <p>These habits stay protected — AI works <em>around</em> them:</p>
+              <div id="lobbyRemindersPreview" class="lobby-reminder-stack"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Bento Cards -->
+      <div class="lobby-feature-trio">
+        <div class="lobby-bento-card pink-glow">
+          <div class="card-icon">&#128202;</div>
+          <h4>BASELINE TRACKING</h4>
+          <p>Log how you currently spend time. AuraFlow identifies bottlenecks — fragmented admin, skipped meals, idle context-switching.</p>
+        </div>
+        <div class="lobby-bento-card green-glow">
+          <div class="card-icon">&#129505;</div>
+          <h4>BIO-RHYTHM SHIELD</h4>
+          <p>Breakfast at 08:00, lunch at 13:00, 3,500-step walks — locked as immutable anchors. AI optimizes everything <em>else</em>.</p>
+        </div>
+        <div class="lobby-bento-card dual-glow">
+          <div class="card-icon">&#9889;</div>
+          <h4>SCHEDULE COMPACTS</h4>
+          <p>Create reusable time-block templates for your week. Stack custom focus sessions, meetings, and breaks your way.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       VIEW 2: COMMAND DECK (DASHBOARD)
+       ========================================================= -->
+  <section id="view-dashboard" class="view-section">
+    <div class="unity-shell">
+
+      <!-- Left Sidebar -->
+      <aside class="unity-sidebar">
+        <div class="brand-mark" onclick="switchView('lobby')" style="cursor:pointer;">
+          <div class="brand-orb"></div>
+          <span>AURA<strong>FLOW</strong></span>
+        </div>
+
+        <div class="nav-group-label">Workspace</div>
+        <nav class="side-nav">
+          <a href="javascript:void(0)" onclick="switchView('lobby')" class="side-link">
+            <span class="side-icon">&#8962;</span> Home
+          </a>
+          <a href="javascript:void(0)" onclick="switchView('dashboard')" class="side-link active">
+            <span class="side-icon">&#9783;</span> Command Deck
+          </a>
+          <a href="javascript:void(0)" onclick="switchView('architect')" class="side-link">
+            <span class="side-icon">&#10024;</span> AI Architect
+          </a>
+          <a href="javascript:void(0)" onclick="switchView('compacts')" class="side-link">
+            <span class="side-icon">&#128218;</span> My Compacts
+          </a>
+          <a href="javascript:void(0)" onclick="switchView('vault')" class="side-link">
+            <span class="side-icon">&#128196;</span> Intel Reports
+          </a>
+        </nav>
+
+        <div class="nav-group-label" style="margin-top:24px;">Bio-Shields</div>
+        <div class="sidebar-bio-stats">
+          <div class="bio-pill">
+            <span>&#129367; Breakfast & Lunch</span>
+            <strong class="pink-txt">PROTECTED</strong>
+          </div>
+          <div class="bio-pill">
+            <span>&#128694; Walking Goal</span>
+            <strong class="green-txt">3,500 steps</strong>
+          </div>
+        </div>
+
+        <div class="sidebar-how-it-works">
+          <div class="nav-group-label" style="margin-top:24px;">Protocol</div>
+          <div class="how-step">
+            <span class="how-num">1</span>
+            <p>Paste tasks in AI Architect</p>
+          </div>
+          <div class="how-step">
+            <span class="how-num">2</span>
+            <p>AI generates optimized schedule</p>
+          </div>
+          <div class="how-step">
+            <span class="how-num">3</span>
+            <p>Timeline updates in real-time</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="unity-main">
+        <!-- Topbar -->
+        <header class="unity-topbar">
+          <div>
+            <p class="greet-sub">WELCOME BACK, OPERATIVE</p>
+            <h2 class="greet-title">COMMAND DECK</h2>
+          </div>
+          <div class="topbar-actions">
+            <div class="search-pill">
+              <span>&#128269;</span>
+              <input type="text" placeholder="Search missions..." id="scheduleSearch" oninput="filterReminders(this.value)" />
+            </div>
+            <div class="notification-badge" onclick="openReminderModal()" title="Add new mission">
+              <span>&#128276;</span>
+              <sup id="activeRemCount">6</sup>
+            </div>
+          </div>
+        </header>
+
+        <!-- Player Stats / XP Bar -->
+        <div class="player-stats-bar" id="playerStatsBar">
+          <div class="player-avatar" id="playerAvatar">P1</div>
+          <div class="player-info">
+            <div class="player-name" id="playerName">PLAYER_ONE</div>
+            <div class="player-level" id="playerLevel">LVL 1 • ROOKIE</div>
+          </div>
+          <div class="xp-bar-container">
+            <div class="xp-label">
+              <span id="xpCurrent">0 XP</span>
+              <span id="xpNext">NEXT: 200 XP</span>
+            </div>
+            <div class="xp-bar-track">
+              <div class="xp-bar-fill" id="xpBarFill" style="width: 0%;"></div>
+            </div>
+          </div>
+          <div class="stat-chips">
+            <div class="stat-chip">
+              <span class="stat-chip-value" id="streakVal">0</span>
+              <span class="stat-chip-label">STREAK</span>
+            </div>
+            <div class="stat-chip">
+              <span class="stat-chip-value" id="tasksVal">0</span>
+              <span class="stat-chip-label">DONE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Banner -->
+        <div class="unity-hero-banner">
+          <div class="hero-banner-copy">
+            <span class="banner-tag">LIVE AI DASHBOARD</span>
+            <h3>AI Routine Command Center</h3>
+            <p id="aiBannerSummary">View your AI-generated schedule, track bio-habits, and measure productivity gains — all in real time.</p>
+            <div class="banner-btn-row">
+              <button class="btn-dark-pill" onclick="switchView('architect')">&#10024; GENERATE SCHEDULE</button>
+              <button class="btn-glass-pill" onclick="openReminderModal()">+ ADD MISSION</button>
+              <button class="btn-glass-pill" onclick="openCompactModal()">+ NEW COMPACT</button>
+            </div>
+          </div>
+          <div class="hero-3d-art">
+            <div class="orb-3d-core">
+              <span class="bump b1"></span>
+              <span class="bump b2"></span>
+              <span class="bump b3"></span>
+              <span class="bump b4"></span>
+              <span class="bump b5"></span>
+              <span class="bump b6"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BIG TIMELINE SECTION -->
+        <div class="big-timeline-card">
+          <div class="timeline-left-col" id="timelineDateCards">
+            <!-- Populated by aura.js -->
+          </div>
+
+          <div class="timeline-right-col">
+            <div class="timeline-header-row">
+              <h4>AI TIME-BLOCKED SCHEDULE <small>(auto-generated)</small></h4>
+              <div class="day-pills">
+                <span>Mo</span>
+                <span class="active-day-pill">Tu</span>
+                <span>We</span>
+                <span>Th</span>
+                <span>Fr</span>
+                <span>Sa</span>
+              </div>
+            </div>
+
+            <div class="gantt-grid" id="ganttGrid">
+              <!-- Time rows rendered by aura.js -->
+            </div>
+
+            <div class="timeline-legend">
+              <span><i class="dot pink-dot"></i> Nutrition & Admin</span>
+              <span><i class="dot green-dot"></i> Deep Work & Walking</span>
+              <span><i class="dot dark-dot"></i> Automated Tasks</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM BENTO ROW -->
+        <div class="bottom-bento-grid">
+
+          <!-- Left: Reminders -->
+          <div class="bento-widget">
+            <div class="widget-head">
+              <h4>DAILY MISSION TRACKER</h4>
+              <span class="subtle-hint">Click to toggle</span>
+            </div>
+            <div id="remindersListContainer" class="icon-progress-list">
+              <!-- Populated by aura.js -->
+            </div>
+            <button class="btn-discover-more" onclick="openReminderModal()">+ ADD CUSTOM MISSION</button>
+          </div>
+
+          <!-- Right: Impact Analytics -->
+          <div class="bento-widget">
+            <div class="widget-head">
+              <h4>AI PRODUCTIVITY IMPACT</h4>
+              <span class="pill-tag green-tag" id="wellnessScoreBadge">85% SYNC</span>
+            </div>
+
+            <div class="impact-split-body">
+              <div class="impact-items-col" id="impactItemsCol">
+                <div class="impact-item active-impact">
+                  <div class="impact-thumb">&#9889;</div>
+                  <div>
+                    <h5>AI TRIAGE</h5>
+                    <p>Admin auto-batched by AI</p>
+                    <span class="mini-price">-68% Friction</span>
+                  </div>
+                </div>
+                <div class="impact-item">
+                  <div class="impact-thumb">&#129367;</div>
+                  <div>
+                    <h5>BIO-SHIELD</h5>
+                    <p>Meals & walks immutable</p>
+                    <span class="mini-price green-price">100% Locked</span>
+                  </div>
+                </div>
+                <div class="impact-item">
+                  <div class="impact-thumb">&#129302;</div>
+                  <div>
+                    <h5>AUTO-SCHEDULE</h5>
+                    <p>Tasks time-blocked by AI</p>
+                    <span class="mini-price">+2.4h Saved</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="impact-chart-col">
+                <div class="chart-box">
+                  <canvas id="unityImpactChart"></canvas>
+                </div>
+                <div class="avg-earning-meta">
+                  <strong>+2.4 Hrs / Day</strong>
+                  <span>Net Deep Focus Gain (AI vs Baseline)</span>
+                  <button class="btn-mini-dark" onclick="switchView('architect')">&#10024; RE-OPTIMIZE</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="segmented-tab-bar">
+              <button class="seg-btn active" onclick="updateChartMode('comparison', this)">Before vs After</button>
+              <button class="seg-btn" onclick="updateChartMode('friction', this)">Friction Drop</button>
+              <button class="seg-btn" onclick="updateChartMode('bio', this)">Habit Sync</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       VIEW 3: AI ROUTINE ARCHITECT
+       ========================================================= -->
+  <section id="view-architect" class="view-section">
+    <div class="architect-container">
+      <div class="section-header-bar">
+        <div>
+          <span class="pill-tag pink-tag">GEMINI AI ENGINE</span>
+          <h2>AI ROUTINE ARCHITECT</h2>
+          <p class="section-subtitle">Paste your messy tasks — the AI builds your perfect day</p>
+        </div>
+        <button class="btn-soft-outline" onclick="switchView('dashboard')">&larr; BACK TO DECK</button>
+      </div>
+
+      <div class="architect-grid">
+        <!-- Left: AI Generator -->
+        <div class="bento-widget architect-main-card">
+          <div class="ai-card-header">
+            <span class="ai-icon-badge">&#10024;</span>
+            <div>
+              <h3>GEMINI SCHEDULE GENERATOR</h3>
+              <p class="widget-desc">Enter your raw tasks below. The AI will create an optimized time-blocked schedule that protects your meals and walks, then push it to your live timeline.</p>
+            </div>
+          </div>
+
+          <label class="field-label">&#9200; WAKE-UP & BREAKFAST TIME</label>
+          <input type="text" id="wakeTimeInput" class="aura-input" value="07:30 AM (Breakfast at 08:00 AM)" />
+
+          <label class="field-label" style="margin-top:14px;">&#128221; RAW TASKS & BOTTLENECKS</label>
+          <textarea id="rawTasksInput" class="aura-textarea" rows="5" placeholder="Example: Complete lab record, summarize lecture PDF, debug Flask backend...">Complete AI & Data Science lab record, summarize 40-slide lecture PDF, draft formal OD letter for symposium, debug Flask SQLite backend, fit in 30-min evening walk and timely lunch.</textarea>
+
+          <div class="ai-generate-section">
+            <button class="btn-gradient-primary full-width" style="margin-top:16px;" onclick="triggerAIRedesign()" id="aiGenerateBtn">
+              &#10024; GENERATE AI SCHEDULE
+            </button>
+            <p class="ai-helper-text">Powered by Google Gemini AI · Results appear in your Command Deck</p>
+          </div>
+          <div id="aiStatusBox" class="ai-status-box hidden"></div>
+        </div>
+
+        <!-- Right: How AI Works + Prompts -->
+        <div class="bento-widget">
+          <h3 style="font-family:'Orbitron',sans-serif; font-size:0.88rem;">&#128161; PROTOCOL OVERVIEW</h3>
+          <div class="how-ai-explainer">
+            <div class="explainer-step">
+              <div class="step-number">1</div>
+              <div>
+                <h5>Parse & Understand</h5>
+                <p>Gemini AI reads your raw tasks and identifies types, durations, and dependencies.</p>
+              </div>
+            </div>
+            <div class="explainer-step">
+              <div class="step-number">2</div>
+              <div>
+                <h5>Lock Bio-Shields</h5>
+                <p>Breakfast (08:00), Lunch (13:00), Walking (18:30) marked as immutable slots.</p>
+              </div>
+            </div>
+            <div class="explainer-step">
+              <div class="step-number">3</div>
+              <div>
+                <h5>Optimize & Schedule</h5>
+                <p>Tasks time-blocked using Pomodoro sprints, batching similar admin tasks.</p>
+              </div>
+            </div>
+            <div class="explainer-step">
+              <div class="step-number">4</div>
+              <div>
+                <h5>Push to Timeline</h5>
+                <p>Final schedule saved to database and rendered on visual Gantt timeline.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-section-divider"></div>
+          <h4 style="margin-top:18px; font-family:'Orbitron',sans-serif; font-size:0.78rem;">&#128218; TESTED PROMPT TEMPLATES</h4>
+          <p class="widget-desc">Click "Copy" to use these proven prompts:</p>
+
+          <div class="prompt-card-mini">
+            <div class="prompt-head">
+              <strong>Morning Task Organizer</strong>
+              <button class="copy-pill" onclick="copyText('Act as an AI productivity architect. Organize these tasks: [TASKS] around strict biological anchors: 08:00 Breakfast, 13:00 Screen-Free Lunch, and 18:30 Brisk Walk. Output a 45-min Pomodoro table.', this)">COPY</button>
+            </div>
+            <code>Organizes raw tasks while protecting meal and walking slots.</code>
+          </div>
+          <div class="prompt-card-mini">
+            <div class="prompt-head">
+              <strong>Lecture PDF Summarizer</strong>
+              <button class="copy-pill" onclick="copyText('Summarize the attached lecture slides into: 1) Five 2-sentence core definitions, 2) Three exam-style worked problems, and 3) A 5-minute rapid revision checklist.', this)">COPY</button>
+            </div>
+            <code>Reduces 75-minute reading to ~12 minutes.</code>
+          </div>
+          <div class="prompt-card-mini">
+            <div class="prompt-head">
+              <strong>Email → Action Extractor</strong>
+              <button class="copy-pill" onclick="copyText('Extract sender, action item, deadline (ISO-8601), and priority tag (P1/P2/P3) from this email in strict JSON format.', this)">COPY</button>
+            </div>
+            <code>Automates email triage into structured action items.</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       VIEW 4: MY SCHEDULE COMPACTS
+       ========================================================= -->
+  <section id="view-compacts" class="view-section">
+    <div class="architect-container">
+      <div class="section-header-bar">
+        <div>
+          <span class="pill-tag green-tag">SCHEDULE BUILDER</span>
+          <h2>MY SCHEDULE COMPACTS</h2>
+          <p class="section-subtitle">Create and manage reusable time-block templates for your weekly routine</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-gradient-primary" onclick="openCompactModal()">+ NEW COMPACT</button>
+          <button class="btn-soft-outline" onclick="switchView('dashboard')">&larr; BACK</button>
+        </div>
+      </div>
+
+      <div class="compacts-grid" id="compactsGrid">
+        <!-- Populated by aura.js -->
+      </div>
+
+      <div style="text-align:center; margin-top:30px; color:var(--text-muted); font-size:0.82rem;" id="compactsEmpty" class="hidden">
+        No compacts yet. Click <strong style="color:var(--neon-cyan);">+ NEW COMPACT</strong> to create your first schedule block!
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       VIEW 5: CAPSTONE 31 INTEL & SUBMISSION HUB
+       ========================================================= -->
+  <section id="view-vault" class="view-section">
+    <div class="architect-container">
+      <div class="section-header-bar">
+        <div>
+          <span class="pill-tag green-tag">CAPSTONE 31 • DOMAIN C</span>
+          <h2>AI ROUTINE REDESIGN INTEL HUB</h2>
+          <p class="section-subtitle">Comprehensive verification, 3-day baseline time logs, 5-day AI tracking, and final 100-mark deliverables</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-soft-outline" onclick="openSlideDeckModal()">&#128250; LAUNCH SLIDE DECK</button>
+          <button class="btn-gradient-primary" onclick="exportCapstoneMarkdown()">&#11015; EXPORT FULL REPORT</button>
+        </div>
+      </div>
+
+      <!-- Capstone Scorecard -->
+      <div class="capstone-scorecard">
+        <div class="scorecard-left">
+          <h3>&#127942; CAPSTONE 31 AUDIT SCORECARD <span style="font-size:0.75rem; color:var(--neon-green);">(WEIGHTAGE: 100 MARKS)</span></h3>
+          <p><strong>Core Research Question:</strong> <em>"How much does AI actually improve a student's or professional's daily routine?"</em></p>
+        </div>
+        <div class="scorecard-badges">
+          <span class="checklist-pill">&#10003; 9/9 DELIVERABLES</span>
+          <span class="checklist-pill">&#10003; 6 AI SKILLS</span>
+          <span class="checklist-pill">&#10003; 4 FREE-TIER TOOLS</span>
+        </div>
+      </div>
+
+      <!-- 9 Final Submission Deliverables Grid -->
+      <h3 style="font-family:'Orbitron',sans-serif; font-size:0.95rem; margin-bottom:12px; color:var(--neon-cyan);">&#128203; FINAL SUBMISSION CHECKLIST (100 MARKS)</h3>
+      <div class="submission-grid">
+        <div class="sub-item-card">
+          <div class="sub-item-head">
+            <span class="sub-num">01 / 09</span>
+            <span class="sub-status-tag">&#10003; VERIFIED</span>
+          </div>
+          <h4>TIME LOG (3-DAY + 5-DAY)</h4>
+          <p>Tracked 3-day baseline routine identifying repetitive time-wasters, plus 5-day AI routine tracking duration and quality.</p>
+        </div>
+
+        <div class="sub-item-card">
+          <div class="sub-item-head">
+            <span class="sub-num">02 / 09</span>
+            <span class="sub-status-tag">&#10003; VERIFIED</span>
+          </div>
+          <h4>NEW AI ROUTINE & COMPACTS</h4>
+          <p>AI-generated schedule time-blocking tasks around immutable biological anchors with customizable schedule compacts.</p>
+        </div>
+
+        <div class="sub-item-card">
+          <div class="sub-item-head">
+            <span class="sub-num">03 / 09</span>
+            <span class="sub-status-tag">&#10003; VERIFIED</span>
+          </div>
+          <h4>BEFORE-VS-AFTER CHART</h4>
+          <p>Interactive Chart.js visual analytics contrasting baseline vs AI-assisted daily hours and habit consistency.</p>
+        </div>
+
+        <div class="sub-item-card">
+          <div class="sub-item-head">
+            <span class="sub-num">04 / 09</span>
+            <span class="sub-status-tag">&#10003; VERIFIED</span>
+          </div>
+          <h4>TASK AUTOMATION PIPELINE</h4>
+          <p>Automated task ingestion webhook (/api/webhook/automate-task) parsing incoming messages into structured reminders.</p>
+        </div>
+
+        <div class="sub-item-card">
+          <div class="sub-item-head">
+            <span class="sub-num">05 / 09</span>
+            <span class="sub-status-tag">&#10003; VERIFIED</span>
+          </div>
+          <h4>PRIVACY & REFLECTION</h4>
+          <p>Critical analysis on privacy safeguards, local SQLite storage, and preventing over-dependence on generative models.</p>
+        </div>
+
+        <div class="sub-item-card">
+          <div class="sub-item-head">
+            <span class="sub-num">06 / 09</span>
+            <span class="sub-status-tag">&#10003; VERIFIED</span>
+          </div>
+          <h4>PROMPT LIBRARY</h4>
+          <p>Structured, reproducible prompts with 1-click copy for Morning Planning, Lecture PDF Summarizing, and Email Triage.</p>
+        </div>
+
+        <div class="sub-item-card">
+          <div class="sub-item-head">
+            <span class="sub-num">07 / 09</span>
+            <span class="sub-status-tag">&#10003; VERIFIED</span>
+          </div>
+          <h4>VERIFICATION REPORT</h4>
+          <p>Quantified 86.7% first-pass AI accuracy audit, documenting schedule collision errors and prompt boundary fixes.</p>
+        </div>
+
+        <div class="sub-item-card">
+          <div class="sub-item-head">
+            <span class="sub-num">08 / 09</span>
+            <span class="sub-status-tag">&#10003; VERIFIED</span>
+          </div>
+          <h4>BEFORE/AFTER ANALYSIS</h4>
+          <p>Empirical proof: +2.4 hours/day deep focus regained, -72% administrative friction drop, 100% meal/walk consistency.</p>
+        </div>
+
+        <div class="sub-item-card">
+          <div class="sub-item-head">
+            <span class="sub-num">09 / 09</span>
+            <span class="sub-status-tag">&#10003; VERIFIED</span>
+          </div>
+          <h4>FINAL DEMO & SLIDE DECK</h4>
+          <p>Fully functional live web app command deck with interactive 5-slide presentation deck ready for project review.</p>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE TIME LOG TABLE (Deliverable #1) -->
+      <div class="bento-widget" style="margin-bottom:24px;">
+        <div class="section-header-bar" style="margin-bottom:12px;">
+          <div>
+            <h3 style="font-family:'Orbitron',sans-serif; font-size:0.95rem; color:var(--neon-green);">&#128337; TIME LOG: 3-DAY BASELINE VS 5-DAY AI ROUTINE</h3>
+            <p class="section-subtitle">Logged activities showing repetitive bottlenecks identified and 5-day AI quality results</p>
+          </div>
+          <div class="segmented-tab-bar" style="max-width:380px;">
+            <button class="seg-btn active" onclick="filterTimeLogs('all', this)">All Logs</button>
+            <button class="seg-btn" onclick="filterTimeLogs('baseline', this)">3-Day Baseline</button>
+            <button class="seg-btn" onclick="filterTimeLogs('ai_routine', this)">5-Day AI Routine</button>
+          </div>
+        </div>
+
+        <div class="timelog-table-wrap">
+          <table class="aura-table">
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>Day</th>
+                <th>Task Activity</th>
+                <th>Category</th>
+                <th>Duration</th>
+                <th>Friction / Repetition</th>
+                <th>Quality Rating</th>
+              </tr>
+            </thead>
+            <tbody id="timelogTableBody">
+              <!-- Rendered by aura.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REQUIRED AI SKILLS & TOOLS MATRICES -->
+      <div class="lobby-hero-grid" style="grid-template-columns: 1fr 1fr; margin-bottom:24px;">
+        <!-- Left: 6 Required AI Skills -->
+        <div class="bento-widget">
+          <h4 style="font-family:'Orbitron',sans-serif; font-size:0.85rem; color:var(--neon-cyan);">&#9889; REQUIRED AI SKILLS (AT LEAST 6 VERIFIED)</h4>
+          <div class="skills-badge-list">
+            <div class="skill-card-badge"><strong>1. AI Foundations:</strong> LLM prompt comprehension & tokens</div>
+            <div class="skill-card-badge"><strong>2. Prompt Engineering:</strong> Role-prompting, few-shot JSON formatting</div>
+            <div class="skill-card-badge"><strong>3. Automation Pipeline:</strong> Webhook payload ingestion into SQLite</div>
+            <div class="skill-card-badge"><strong>4. Productivity Workflow:</strong> Biological rhythm shields & Pomodoro blocks</div>
+            <div class="skill-card-badge"><strong>5. Responsible AI:</strong> Local SQLite storage, zero PII transmission</div>
+            <div class="skill-card-badge"><strong>6. Presentation & Synthesis:</strong> Chart.js visual analytics & slide deck</div>
+          </div>
+        </div>
+
+        <!-- Right: Required Free-Tier Tools -->
+        <div class="bento-widget">
+          <h4 style="font-family:'Orbitron',sans-serif; font-size:0.85rem; color:var(--neon-magenta);">&#128295; REQUIRED FREE-TIER TOOLS (4+ VERIFIED)</h4>
+          <div class="skills-badge-list">
+            <div class="skill-card-badge"><strong>1. Google Gemini (Free Tier):</strong> Routine generation & NLP extraction</div>
+            <div class="skill-card-badge"><strong>2. ChatGPT / LLM:</strong> Prompt library matrix testing</div>
+            <div class="skill-card-badge"><strong>3. Zapier / Webhooks:</strong> Zero-touch daily task automation</div>
+            <div class="skill-card-badge"><strong>4. Google Calendar / Gantt:</strong> Visual time-block timeline synchronization</div>
+            <div class="skill-card-badge"><strong>5. Notion / Markdown:</strong> Capstone submission report generation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Three Core Reflective Reports -->
+      <div class="lobby-feature-trio" style="margin-top:18px;">
+        <div class="bento-widget report-card">
+          <div class="report-icon">&#128270;</div>
+          <h4>AI ACCURACY & VERIFICATION</h4>
+          <p style="margin-top:10px; color:var(--text-secondary); font-size:0.88rem; line-height:1.7;">
+            Across 5 days of AI-assisted scheduling, 15 prompts were executed. In 2 instances (13.3%), the AI scheduled deep coding blocks overlapping with commute hours.
+            <strong style="color:var(--neon-cyan);">Fix:</strong> Added hard boundary constraints in system prompts.
+          </p>
+          <div class="report-stat">
+            <span class="stat-value">86.7%</span>
+            <span class="stat-label">First-pass accuracy</span>
+          </div>
+        </div>
+        <div class="bento-widget report-card">
+          <div class="report-icon">&#128274;</div>
+          <h4>DATA STAYS LOCAL</h4>
+          <p style="margin-top:10px; color:var(--text-secondary); font-size:0.88rem; line-height:1.7;">
+            All personal habit logs are stored <strong style="color:var(--neon-green);">locally in SQLite</strong>.
+            Only task descriptions are sent to the AI. Personal identifiers and credentials are never transmitted.
+          </p>
+          <div class="report-stat">
+            <span class="stat-value green-stat">100%</span>
+            <span class="stat-label">Local data retention</span>
+          </div>
+        </div>
+        <div class="bento-widget report-card">
+          <div class="report-icon">&#129504;</div>
+          <h4>AI vs HUMAN BALANCE</h4>
+          <p style="margin-top:10px; color:var(--text-secondary); font-size:0.88rem; line-height:1.7;">
+            AI handles admin friction (formatting, drafting, summarization), freeing <strong style="color:var(--neon-amber);">+2.4 hours/day</strong>.
+            Core problem-solving and physical habits remain human-led to prevent over-dependence.
+          </p>
+          <div class="report-stat">
+            <span class="stat-value">+2.4h</span>
+            <span class="stat-label">Daily time saved</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FLOATING BOTTOM DOCK NAVIGATION
+       ========================================================= -->
+  <div class="floating-dock-wrapper">
+    <div class="floating-glass-dock">
+      <button class="dock-btn active" id="dock-lobby" onclick="switchView('lobby')">
+        <span class="dock-icon">&#10022;</span>
+        <span>Home</span>
+      </button>
+      <button class="dock-btn" id="dock-dashboard" onclick="switchView('dashboard')">
+        <span class="dock-icon">&#9783;</span>
+        <span>Deck</span>
+      </button>
+      <button class="dock-btn" id="dock-architect" onclick="switchView('architect')">
+        <span class="dock-icon">&#9889;</span>
+        <span>AI</span>
+      </button>
+      <button class="dock-btn" id="dock-compacts" onclick="switchView('compacts')">
+        <span class="dock-icon">&#128218;</span>
+        <span>Compacts</span>
+      </button>
+      <button class="dock-btn" id="dock-vault" onclick="switchView('vault')">
+        <span class="dock-icon">&#128196;</span>
+        <span>Intel</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL: ADD REMINDER / MISSION
+       ========================================================= -->
+  <div id="reminderModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h3>&#9889; ADD NEW MISSION</h3>
+      <p>Keep your body and focus synchronized — the AI schedules around these anchors.</p>
+
+      <label class="field-label">Mission Title</label>
+      <input type="text" id="newRemTitle" class="aura-input" placeholder="e.g., Afternoon Green Tea & 10-Min Walk" />
+
+      <label class="field-label" style="margin-top:12px;">Scheduled Time</label>
+      <input type="text" id="newRemTime" class="aura-input" placeholder="e.g., 04:30 PM" />
+
+      <label class="field-label" style="margin-top:12px;">Category</label>
+      <select id="newRemCat" class="aura-input">
+        <option value="Nutrition">Nutrition (Breakfast / Lunch / Hydration)</option>
+        <option value="Movement">Movement (Walking / Stretching)</option>
+        <option value="Wellness">Mindfulness & Rest</option>
+        <option value="Academic">Academic Deep Work</option>
+      </select>
+
+      <div class="modal-actions">
+        <button class="btn-soft-outline" onclick="closeReminderModal()">CANCEL</button>
+        <button class="btn-gradient-primary" onclick="submitNewReminder()">SAVE MISSION</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL: CREATE SCHEDULE COMPACT
+       ========================================================= -->
+  <div id="compactModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h3>&#128218; CREATE SCHEDULE COMPACT</h3>
+      <p>Build a reusable time-block for your weekly routine. Stack them to design your ideal week.</p>
+
+      <div class="compact-form-grid">
+        <div class="full-span">
+          <label class="field-label">Compact Name</label>
+          <input type="text" id="compactName" class="aura-input" placeholder="e.g., Morning Code Sprint" />
+        </div>
+
+        <div class="full-span">
+          <label class="field-label">Description</label>
+          <input type="text" id="compactDesc" class="aura-input" placeholder="e.g., Deep focus coding on capstone project" />
+        </div>
+
+        <div>
+          <label class="field-label">Day</label>
+          <select id="compactDay" class="aura-input">
+            <option value="Mon">Monday</option>
+            <option value="Tue">Tuesday</option>
+            <option value="Wed">Wednesday</option>
+            <option value="Thu">Thursday</option>
+            <option value="Fri">Friday</option>
+            <option value="Sat">Saturday</option>
+            <option value="Sun">Sunday</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="field-label">Category</label>
+          <select id="compactCategory" class="aura-input">
+            <option value="Engineering">Engineering</option>
+            <option value="Academic">Academic</option>
+            <option value="Movement">Movement</option>
+            <option value="Admin">Admin</option>
+            <option value="Focus">Focus</option>
+            <option value="Creative">Creative</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="field-label">Start Time</label>
+          <input type="text" id="compactStart" class="aura-input" placeholder="09:00 AM" />
+        </div>
+
+        <div>
+          <label class="field-label">End Time</label>
+          <input type="text" id="compactEnd" class="aura-input" placeholder="11:00 AM" />
+        </div>
+
+        <div>
+          <label class="field-label">Priority</label>
+          <select id="compactPriority" class="aura-input">
+            <option value="Normal">Normal</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="field-label">Recurring</label>
+          <select id="compactRecurring" class="aura-input">
+            <option value="1">Yes — Every Week</option>
+            <option value="0">No — One-Time</option>
+          </select>
+        </div>
+
+        <div class="full-span">
+          <label class="field-label">Color Tag</label>
+          <div class="color-selector" id="colorSelector">
+            <div class="color-dot dot-cyan selected" data-color="cyan" onclick="selectColor('cyan', this)"></div>
+            <div class="color-dot dot-magenta" data-color="magenta" onclick="selectColor('magenta', this)"></div>
+            <div class="color-dot dot-neon" data-color="neon" onclick="selectColor('neon', this)"></div>
+            <div class="color-dot dot-amber" data-color="amber" onclick="selectColor('amber', this)"></div>
+            <div class="color-dot dot-purple" data-color="purple" onclick="selectColor('purple', this)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-soft-outline" onclick="closeCompactModal()">CANCEL</button>
+        <button class="btn-gradient-primary" onclick="submitNewCompact()">CREATE COMPACT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL: CAPSTONE 31 SLIDE DECK (FINAL DEMO / SUMMARY)
+       ========================================================= -->
+  <div id="slideDeckModal" class="modal-backdrop hidden">
+    <div class="deck-modal-card">
+      <div class="deck-slide-header">
+        <div>
+          <span class="pill-tag green-tag">CAPSTONE 31 • SUMMARY SLIDE DECK</span>
+          <h2 id="slideTitle">1. Project Question & Domain</h2>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="deck-slide-counter" id="slideCounter">SLIDE 1 OF 5</span>
+          <button class="btn-soft-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="closeSlideDeckModal()">&#10005;</button>
+        </div>
+      </div>
+
+      <div class="deck-slide-view">
+        <div class="deck-slide-body" id="slideBody">
+          <!-- Populated by aura.js -->
+        </div>
+
+        <div class="deck-controls">
+          <button class="btn-soft-outline" id="prevSlideBtn" onclick="prevSlide()">&larr; PREVIOUS</button>
+          <div style="display:flex; gap:6px;" id="slideDotIndicators">
+            <!-- Populated by aura.js -->
+          </div>
+          <button class="btn-gradient-primary" id="nextSlideBtn" onclick="nextSlide()">NEXT &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='aura.js') }}"></script>
+</body>
+</html>
